@@ -1,0 +1,16 @@
+﻿<div id="month" name="month" class="container-fluid overflow-hidden">
+    <div class="row flex-nowrap">
+        @foreach (var day in Days)
+        {
+            @DayTemplate(day)
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public RenderFragment<KeyValuePair<int, string>> DayTemplate { get; set; }
+
+    [Parameter]
+    public IEnumerable<KeyValuePair<int, string>> Days { get; set; }
+}

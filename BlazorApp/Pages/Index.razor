@@ -1,0 +1,32 @@
+﻿@page "/"
+
+<PageTitle>Index</PageTitle>
+
+<h4 class="text-center">Agendamentos</h4>
+
+<CreateAppointmentForm />
+
+<Calendar ExpandedEventsCallback="@(state => ExpandedEvents = state)">
+    <Month>
+        <CalendarMonth Days="_days" Context="day">
+            <DayTemplate>
+                <CalendarDay DayNumberAndName="day" Expanded="ExpandedEvents"></CalendarDay>
+            </DayTemplate>
+        </CalendarMonth>
+    </Month>
+</Calendar>
+
+@code {
+    bool ExpandedEvents;
+    List<KeyValuePair<int, string>> _days = new();
+    protected override void OnInitialized()
+    {
+        _days.Add(new KeyValuePair<int, string>(1, "Segunda-feira"));
+        _days.Add(new KeyValuePair<int, string>(2, "Terça-feira"));
+        _days.Add(new KeyValuePair<int, string>(3, "Quarta-feira"));
+        _days.Add(new KeyValuePair<int, string>(4, "Quinta-feira"));
+        _days.Add(new KeyValuePair<int, string>(5, "Sexta-feira"));
+        _days.Add(new KeyValuePair<int, string>(6, "Sábado"));
+        _days.Add(new KeyValuePair<int, string>(7, "Domingo"));
+    }
+}

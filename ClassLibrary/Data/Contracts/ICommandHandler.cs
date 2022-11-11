@@ -1,5 +1,10 @@
 ﻿namespace ClassLibrary.Data.Contracts;
-internal interface ICommandHandler<TCommand> : IHandler where TCommand : ICommand
+public interface ICommandHandler<TCommand> : IHandler where TCommand : ICommand
 {
-    Task Handle(TCommand command);
+    Task HandleAsync(TCommand command);
+}
+
+public interface ICommandHandler<TCommand, TResult> : IHandler where TCommand : ICommand
+{
+    Task<TResult> HandleAsync(TCommand command);
 }

@@ -1,15 +1,36 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Runtime.Serialization;
+using System.Security.Claims;
+using System.Security.Principal;
 
 namespace ClassLibrary.Models;
-
-public class Employee : User, IUser
+public class Employee : ClaimsPrincipal
 {
-    public override DateTime CreatedAt { get; set; }
-    public override bool Deleted { get; set; }
-    public override int Id { get; set; }
-    public override DateTime UpdatedAt { get; set; }
-    public List<Appointment>? Appointments { get; set; }
+    public Employee()
+    {
+    }
 
-    [StringLength(100, MinimumLength = 3, ErrorMessage = "O Nome de Exibição do deve conter entre 3 e 100 caracteres.")]
-    public override string? DisplayName { get; set; }
+    public Employee(IEnumerable<ClaimsIdentity> identities) : base(identities)
+    {
+    }
+
+    public Employee(BinaryReader reader) : base(reader)
+    {
+    }
+
+    public Employee(IIdentity identity) : base(identity)
+    {
+    }
+
+    public Employee(IPrincipal principal) : base(principal)
+    {
+    }
+
+    protected Employee(SerializationInfo info, StreamingContext context) : base(info, context)
+    {
+    }
+
+    public override string ToString()
+    {
+        return Identity?.Name ?? string.Empty;
+    }
 }

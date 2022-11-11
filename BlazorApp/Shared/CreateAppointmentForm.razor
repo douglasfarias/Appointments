@@ -1,0 +1,88 @@
+﻿@using ClassLibrary.Data.Commands
+@using ClassLibrary.Extensions
+
+@if (_model is null)
+    return;
+
+<EditForm Model="_model" OnValidSubmit="HandleValidSubmit">
+    <fieldset class="border border-secondary p-3 my-3 col-sm-3">
+        <legend class="text-center">
+            <small>
+                Criar Agendamento
+            </small>
+        </legend>
+        <div class="form-group mb-3">
+            <label class="form-label form-label-sm">
+                <small>
+                    Cliente
+                </small>
+            </label>
+            <div class="row">
+                <div class="col-sm-8">
+                    <input type="text" class="form-control form-control-sm" @bind="_model.CustomerId" @bind:event="oninput" list="customers" />
+                </div>
+                <span class="col">
+                    <small>
+                        @_customers?.FirstOrDefault(customer => customer?.Identity.Name == _model?.CustomerId)?.GetFullName()
+                    </small>
+                </span>
+            </div>
+            <datalist id="customers" name="customers">
+                @if (_customers is not null)
+                {
+                    foreach (var customer in _customers)
+                    {
+                        <option value="@customer?.Identity?.Name">
+                            @customer?.Identity?.Name - @customer?.GetFullName()
+                        </option>
+                    }
+                }
+            </datalist>
+        </div>
+        <div class="form-group mb-3">
+            <label class="form-label form-label-sm">
+                <small>
+                    Profissional
+                </small>
+            </label>
+            <div class="row">
+                <div class="col-sm-8">
+                    <input type="text" class="form-control form-control-sm" @bind="_model.EmployeeId" @bind:event="oninput" list="employees" />
+                </div>
+                <span class="col">
+                    <small>
+                        @_employees?.FirstOrDefault(employee => employee?.Identity.Name == _model?.EmployeeId)?.GetFullName()
+                    </small>
+                </span>
+            </div>
+            <datalist id="employees" name="employees">
+                @if (_employees is not null)
+                {
+                    foreach (var employee in _employees)
+                    {
+                        <option value="@employee?.Identity?.Name">
+                            @employee?.Identity?.Name - @employee?.GetFullName()
+                        </option>
+                    }
+                }
+            </datalist>
+        </div>
+        <div class="form-group mb-3">
+            <label class="form-label form-label-sm">
+                <small>
+                    Data
+                </small>
+            </label>
+            <div class="row">
+                <div class="col-sm-8">
+                    <input type="datetime-local" class="form-control form-control-sm" @bind="_model.Date" />
+                </div>
+            </div>
+        </div>
+        <div class="form-group my-3">
+            <input type="submit" value="Enviar" class="btn btn-primary" />
+        </div>
+    </fieldset>
+</EditForm>
+
+

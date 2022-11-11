@@ -7,13 +7,6 @@ public interface IHandler
 
 public abstract class Handler : IHandler
 {
-    protected IConnectionProvider ConnectionProvider { get; init; }
-
-    protected Handler(IConnectionProvider connectionProvider)
-    {
-        ConnectionProvider = connectionProvider;
-    }
-
     protected IHandler? NextHandler { get; set; }
     public virtual void SetNext(IHandler handler)
     {

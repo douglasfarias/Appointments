@@ -6,8 +6,6 @@ public class Service : IEntity
     public bool Deleted { get; set; }
     public int Id { get; set; }
     public DateTime UpdatedAt { get; set; }
-    public int OwnerId { get; set; }
-    public User? Owner { get; set; }
     public string? Name { get; set; }
     public double Price { get; set; }
 

@@ -1,0 +1,18 @@
+﻿<div id="calendar" name="calendar">
+    @Month
+</div>
+
+@code {
+    bool ExpandedEvents;
+    bool Creating;
+    [Parameter]
+    public EventCallback<bool> ExpandedEventsCallback { get; set; }
+    [Parameter]
+    public RenderFragment? Month { get; set; }
+
+    private void ToggleExpandedEvents()
+    {
+        ExpandedEvents = !ExpandedEvents;
+        ExpandedEventsCallback.InvokeAsync(ExpandedEvents);
+    }
+}

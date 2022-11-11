@@ -3,7 +3,12 @@
 namespace ClassLibrary.Data;
 public class SqlServerConnectionProvider : ConnectionProvider, IConnectionProvider
 {
-    public SqlServerConnectionProvider(IDbConnection dbConnection) : base(dbConnection)
+    private SqlServerConnectionProvider(IDbConnection dbConnection) : base(dbConnection)
     {
+    }
+
+    public static SqlServerConnectionProvider CreateInstance(IDbConnection dbConnection)
+    {
+        return new SqlServerConnectionProvider(dbConnection);
     }
 }

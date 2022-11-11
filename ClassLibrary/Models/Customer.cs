@@ -1,27 +1,36 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Runtime.Serialization;
+using System.Security.Claims;
+using System.Security.Principal;
 
 namespace ClassLibrary.Models;
-
-public class Customer : User, IUser
+public class Customer : ClaimsPrincipal
 {
-    public static Customer Create()
+    public Customer()
     {
-        var customer = new Customer
-        {
-            CreatedAt = DateTime.Now,
-            UpdatedAt = DateTime.Now,
-            DisplayName = String.Empty
-        };
-
-        return customer;
     }
 
-    public override DateTime CreatedAt { get; set; }
-    public override bool Deleted { get; set; }
-    public override int Id { get; set; }
-    public override DateTime UpdatedAt { get; set; }
-    public List<Appointment>? Appointments { get; set; }
+    public Customer(IEnumerable<ClaimsIdentity> identities) : base(identities)
+    {
+    }
 
-    [StringLength(100, MinimumLength = 3, ErrorMessage = "O Nome de Exibição do deve conter entre 3 e 100 caracteres.")]
-    public override string? DisplayName { get; set; }
+    public Customer(BinaryReader reader) : base(reader)
+    {
+    }
+
+    public Customer(IIdentity identity) : base(identity)
+    {
+    }
+
+    public Customer(IPrincipal principal) : base(principal)
+    {
+    }
+
+    protected Customer(SerializationInfo info, StreamingContext context) : base(info, context)
+    {
+    }
+
+    public override string ToString()
+    {
+        return Identity?.Name ?? string.Empty;
+    }
 }

@@ -1,0 +1,29 @@
+﻿@using ClassLibrary.Data.Commands
+@using ClassLibrary.Data.Contracts
+
+<EditForm Model="_command" OnValidSubmit="OnValidSubmit" id="CreateCustomerForm" name="CreateCustomerForm">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <fieldset>
+        <legend>Criar Cliente</legend>
+        <div class="form-group">
+            <label for="Name">Email</label>
+            <InputText @bind-Value="_command.Name" class="form-control form-control-sm" />
+        </div>
+        <div class="form-group">
+            <label for="DisplayName">Primeiro Nome</label>
+            <InputText @bind-Value="_command.GivenName" class="form-control form-control-sm" />
+        </div>
+        <div class="form-group">
+            <label for="DisplayName">Sobrenome</label>
+            <InputText @bind-Value="_command.SureName" class="form-control form-control-sm" />
+        </div>
+        <div class="form-group">
+            <label for="PhoneNumber">Celular</label>
+            <InputText @bind-Value="_command.PhoneNumber" class="form-control form-control-sm" />
+        </div>
+        <div class="form-group">
+            <input type="submit" value="Enviar" form="CreateCustomerForm" class="btn btn-primary" />
+        </div>
+    </fieldset>
+</EditForm>

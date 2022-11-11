@@ -7,12 +7,6 @@ public interface ICommand
 
 public abstract class Command<TCommand> : ICommand where TCommand : ICommand
 {
-    protected Func<TCommand, Task> Receiver;
-
-    protected Command(Func<TCommand, Task> receiver)
-    {
-        Receiver = receiver;
-    }
-
+    public Func<TCommand, Task>? Receiver { get; set; }
     public abstract Task ExecuteAsync();
 }
