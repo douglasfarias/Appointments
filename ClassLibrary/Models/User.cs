@@ -1,57 +1,48 @@
-﻿using System.Security.Claims;
-using System.Security.Principal;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
+
+using ClassLibrary.Models.Base;
 
 namespace ClassLibrary.Models;
 
-public enum UserRoles
+public abstract class User : Entity
 {
-    Employee,
-    Customer
-}
+	public User()
+	{
 
-public interface IUser : IPrincipal
-{
-    DateTime CreatedAt { get; set; }
-    bool Deleted { get; set; }
-    string DisplayName { get; }
-    int Id { get; set; }
-    DateTime UpdatedAt { get; set; }
-}
+	}
 
-public abstract class User : ClaimsPrincipal, IEntity, IUser
-{
-    protected User(IPrincipal principal) : base(principal)
-    {
-    }
+	public User(UserRole role,
+			 string givenName,
+			 string surename,
+			 string email,
+			 string phone,
+			 int id = 0,
+			 DateTime createdAt = default,
+			 DateTime updatedAt = default,
+			 bool deleted = false) : base(id, createdAt, updatedAt, deleted)
+	{
+		Role = role;
+		GivenName = givenName;
+		Surename = surename;
+		Email = email;
+		Phone = phone;
+	}
 
-    public abstract DateTime CreatedAt { get; set; }
-    public abstract bool Deleted { get; set; }
-    public abstract int Id { get; set; }
-    public abstract DateTime UpdatedAt { get; set; }
-    public virtual string DisplayName
-    {
-        get
-        {
-            return $"{GetGivenName()} {GetSureName()}";
-        }
-    }
+	public UserRole Role { get; set; }
+	public string GivenName { get; set; }
+	public string Surename { get; set; }
+	public string Email { get; set; }
+	public string Phone { get; set; }
 
-    private string? GetSureName()
-    {
-        return Claims?.FirstOrDefault(claim => claim.Type.Equals(ClaimTypes.Surname))?.Value;
-    }
+	public override string ToString()
+	{
+		return GetFullName();
+	}
 
-    private string? GetGivenName()
-    {
-        return Claims?.FirstOrDefault(claim => claim.Type.Equals(ClaimTypes.GivenName))?.Value;
-    }
-
-    public override bool Equals(object? obj) => obj != null && ((User)obj).Id.Equals(Id);
-
-    public override int GetHashCode()
-    {
-        return base.GetHashCode();
-    }
-
-    public override string? ToString() => DisplayName;
+	public string GetFullName()
+	{
+		return $"{GivenName} {Surename}";
+	}
 }

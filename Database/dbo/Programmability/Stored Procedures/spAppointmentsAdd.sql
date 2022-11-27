@@ -1,18 +1,31 @@
 ﻿CREATE PROCEDURE [dbo].[spAppointmentsAdd]
-	@CustomerId nvarchar(450),
-	@EmployeeId nvarchar(450),
-	@Date datetime
+	@CustomerId int,
+	@EmployeeId int,
+	@Date datetime,
+	@AmountDue numeric null = 0, 
+	@AmountPaid numeric null = 0
 
 AS
-	return insert into tbAppointments (CustomerId, EmployeeId, Date) 
-	output [inserted].[Id], 
-		[inserted].[CreatedAt], 
-		[inserted].[UpdatedAt], 
-		[inserted].[Deleted], 
-		[inserted].[Date], 
-		[inserted].[Done], 
-		[inserted].[CustomerId], 
-		[inserted].[EmployeeId], 
-		[inserted].[AmountDue], 
-		[inserted].[AmountPaid] 
-	values (@CustomerId, @EmployeeId, @Date)
+	insert into tbAppointments (CustomerId, EmployeeId, Date, AmountDue, AmountPaid) 
+	values (@CustomerId, @EmployeeId, @Date, @AmountDue, @AmountPaid)
+	select 
+		[Appointments].[Id], 
+		[Appointments].[CreatedAt], 
+		[Appointments].[UpdatedAt], 
+		[Appointments].[Deleted], 
+		[Appointments].[Date], 
+		[Appointments].[Done], 
+		[Appointments].[AmountDue], 
+		[Appointments].[AmountPaid],
+		[Appointments].[CustomerId], 
+		[Appointments].[EmployeeId],
+		[Customer].[Id],
+		[Customer].[GivenName],
+		[Customer].[Surename],
+		[Employee].[Id],
+		[Employee].[GivenName],
+		[Employee].[Surename]
+	from tbAppointments Appointments 
+	left join tbUsers Customer on Customer.Id = Appointments.CustomerId
+	left join tbUsers Employee on Employee.Id = Appointments.EmployeeId
+	where Appointments.Id = @@IDENTITY

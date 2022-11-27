@@ -1,88 +1,210 @@
 ﻿@using ClassLibrary.Data.Commands
+@using ClassLibrary.Data.Handlers;
+@using ClassLibrary.Data.Queries;
+@using ClassLibrary.Data.Repositories;
 @using ClassLibrary.Extensions
+@using ClassLibrary.Factories;
+@using ClassLibrary.Models;
+@using ClassLibrary;
 
 @if (_model is null)
     return;
 
 <EditForm Model="_model" OnValidSubmit="HandleValidSubmit">
-    <fieldset class="border border-secondary p-3 my-3 col-sm-3">
+    <fieldset>
         <legend class="text-center">
             <small>
-                Criar Agendamento
+                Novo Agendamento
             </small>
         </legend>
         <div class="form-group mb-3">
-            <label class="form-label form-label-sm">
-                <small>
-                    Cliente
-                </small>
-            </label>
             <div class="row">
-                <div class="col-sm-8">
-                    <input type="text" class="form-control form-control-sm" @bind="_model.CustomerId" @bind:event="oninput" list="customers" />
+                <div class="form-group mb-3 col-sm-4">
+                    <label class="col-form-label-sm">
+                        Código Cliente
+                    </label>
+                    <InputNumber @bind-Value="_model.CustomerId" class="form-control form-control-sm" readonly />
                 </div>
-                <span class="col">
-                    <small>
-                        @_customers?.FirstOrDefault(customer => customer?.Identity.Name == _model?.CustomerId)?.GetFullName()
-                    </small>
-                </span>
+                <div class="form-group mb-3 col">
+                    <label class="col-form-label-sm">
+                        Nome Cliente
+                    </label>
+                    <AutoComplete Label="@_selectedCustomer?.GetFullName()" SelectionChanged="CustomerChanged" Options="_customers?.Select(item => new AutoComplete.Option(item.Id.ToString(), item.GetFullName()))" Id="customers" />
+                </div>
             </div>
             <datalist id="customers" name="customers">
                 @if (_customers is not null)
                 {
                     foreach (var customer in _customers)
                     {
-                        <option value="@customer?.Identity?.Name">
-                            @customer?.Identity?.Name - @customer?.GetFullName()
+                        <option value="@customer?.Id">
+                            @customer?.GetFullName()
                         </option>
                     }
                 }
             </datalist>
         </div>
         <div class="form-group mb-3">
-            <label class="form-label form-label-sm">
-                <small>
-                    Profissional
-                </small>
-            </label>
             <div class="row">
-                <div class="col-sm-8">
-                    <input type="text" class="form-control form-control-sm" @bind="_model.EmployeeId" @bind:event="oninput" list="employees" />
+                <div class="form-group mb-3 col-sm-4">
+                    <label class="col-form-label-sm">
+                        Código Profissional
+                    </label>
+                    <InputNumber @bind-Value="_model.EmployeeId" class="form-control form-control-sm" readonly />
                 </div>
-                <span class="col">
-                    <small>
-                        @_employees?.FirstOrDefault(employee => employee?.Identity.Name == _model?.EmployeeId)?.GetFullName()
-                    </small>
-                </span>
+                <div class="form-group mb-3 col">
+                    <label class="col-form-label-sm">
+                        Nome Profissional
+                    </label>
+                    <AutoComplete Label="@_selectedEmployee?.GetFullName()" SelectionChanged="EmployeeChanged" Options="_employees?.Select(item => new AutoComplete.Option(item.Id.ToString(), item.GetFullName()))" Id="employess" />
+                </div>
             </div>
             <datalist id="employees" name="employees">
                 @if (_employees is not null)
                 {
                     foreach (var employee in _employees)
                     {
-                        <option value="@employee?.Identity?.Name">
-                            @employee?.Identity?.Name - @employee?.GetFullName()
+                        <option value="@employee?.Id">
+                            @employee?.GetFullName()
                         </option>
                     }
                 }
             </datalist>
         </div>
         <div class="form-group mb-3">
-            <label class="form-label form-label-sm">
-                <small>
-                    Data
-                </small>
-            </label>
             <div class="row">
-                <div class="col-sm-8">
-                    <input type="datetime-local" class="form-control form-control-sm" @bind="_model.Date" />
+                <div class="col-sm-4">
+                    <label class="col-form-label-sm">
+                        Data
+                    </label>
+                    <div class="row">
+                        <div class="col">
+                            <input type="datetime-local" class="form-control form-control-sm" @bind="_model.Date" />
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <label class="col-form-label-sm">
+                        Total
+                    </label>
+                    <div class="row">
+                        <div class="col">
+                            <InputNumber @bind-Value="_model.AmonutDue" class="form-control form-control-sm" />
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <label class="col-form-label-sm">
+                        Pago
+                    </label>
+                    <div class="row">
+                        <div class="col">
+                            <InputNumber @bind-Value="_model.AmonutPaid" class="form-control form-control-sm" />
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="form-group my-3">
-            <input type="submit" value="Enviar" class="btn btn-primary" />
+        <div class="form-group mb-3">
+            <div class="row">
+                <div class="col">
+                    <input type="submit" class="btn btn-sm btn-primary" value="Enviar" disabled="@_loading" />
+                </div>
+                <div class="col">
+                    <Spinner Show="_loading" />
+                </div>
+            </div>
         </div>
     </fieldset>
 </EditForm>
 
+@code {
+    @implements IDisposable
 
+    [Inject]
+    public ICommandFactory? CommandFactory { get; set; }
+
+    [Inject]
+    public IAppointmentsHandler? AppointmentsHandler { get; set; }
+    [Inject]
+    public ICustomersHandler? CustomersHandler { get; set; }
+    [Inject]
+    public IEmployeesHandler? EmployeesHandler { get; set; }
+
+    List<Customer>? _customers { get; set; }
+    List<Employee>? _employees { get; set; }
+
+    Customer? _selectedCustomer;
+    Employee? _selectedEmployee;
+
+    CreateAppointmentCommand? _model;
+    bool _loading = true;
+    protected override async Task OnInitializedAsync()
+    {
+        CustomersHandler!.CustomerCreated += OnCustomerCreated;
+        EmployeesHandler!.EmployeeCreated += OnEmployeeCreated;
+
+        _customers = await CommandFactory!.ListCustomersQuery(CustomersHandler.HandleAsync).ExecuteAsync();
+        _employees = await CommandFactory!.ListEmployeesQuery(EmployeesHandler.HandleAsync).ExecuteAsync();
+
+        _model = CommandFactory!.CreateAppointmentCommand(AppointmentsHandler!.HandleAsync);
+        _loading = false;
+
+    }
+
+    public void Dispose()
+    {
+        CustomersHandler!.CustomerCreated -= OnCustomerCreated;
+        EmployeesHandler!.EmployeeCreated -= OnEmployeeCreated;
+
+    }
+
+    private void OnCustomerCreated(object? sender, Customer customer)
+    {
+        _customers?.Add(customer);
+        StateHasChanged();
+    }
+
+    private void OnEmployeeCreated(object? sender, Employee employee)
+    {
+        _employees?.Add(employee);
+        StateHasChanged();
+    }
+
+    private async Task HandleValidSubmit(EditContext context)
+    {
+        _loading = true;
+        await _model!.ExecuteAsync();
+        _model = CommandFactory!.CreateAppointmentCommand(AppointmentsHandler!.HandleAsync);
+        _selectedCustomer = null;
+        _selectedEmployee = null;
+        _loading = false;
+
+    }
+
+    private void CustomerChanged(string term)
+    {
+        if (!int.TryParse(term, out int id))
+        {
+            _selectedCustomer = null;
+            _model!.CustomerId = null;
+            return;
+        }
+
+        _selectedCustomer = _customers?.FirstOrDefault(item => item?.Id == id);
+        _model!.CustomerId = _selectedCustomer?.Id;
+    }
+
+    private void EmployeeChanged(string term)
+    {
+        if (!int.TryParse(term, out int id))
+        {
+            _selectedEmployee = null;
+            _model!.EmployeeId = null;
+            return;
+        }
+
+        _selectedEmployee = _employees?.FirstOrDefault(item => item?.Id == id);
+        _model!.EmployeeId = _selectedEmployee?.Id;
+    }
+}

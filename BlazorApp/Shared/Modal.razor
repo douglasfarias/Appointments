@@ -1,0 +1,21 @@
+﻿<div class="modal fade" id="@Id" tabindex="-1" aria-labelledby="@(Id + "Label")" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content bg-dark text-white">
+            <div>
+                <button type="button" class="btn" data-bs-dismiss="modal" aria-label="Fechar"><i class="bi bi-x-lg text-light"></i></button>
+            </div>
+            <div class="modal-body">
+                @ChildContent
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public string? Id { get; set; }
+    [Parameter]
+    public string? Label { get; set; }
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+}

@@ -1,20 +1,38 @@
-﻿namespace ClassLibrary.Models;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
 
-public class Service : IEntity
+using ClassLibrary.Models.Base;
+
+namespace ClassLibrary.Models;
+
+public class Service : Entity
 {
-    public DateTime CreatedAt { get; set; }
-    public bool Deleted { get; set; }
-    public int Id { get; set; }
-    public DateTime UpdatedAt { get; set; }
-    public string? Name { get; set; }
-    public double Price { get; set; }
+	public Service()
+	{
 
-    public override bool Equals(object? obj) => obj != null && ((Service)obj).Id.Equals(Id);
+	}
 
-    public override int GetHashCode()
-    {
-        return base.GetHashCode();
-    }
+	public Service(string? name,
+				double price,
+				int id = 0,
+				DateTime createdAt = default,
+				DateTime updatedAt = default,
+				bool deleted = false) : base(id, createdAt, updatedAt, deleted)
+	{
+		Name = name;
+		Price = price;
+	}
 
-    public override string? ToString() => Name;
+	public string? Name { get; set; }
+	public double Price { get; set; }
+
+	public override bool Equals(object? obj) => obj != null && ((Service)obj).Id.Equals(Id);
+
+	public override int GetHashCode()
+	{
+		return base.GetHashCode();
+	}
+
+	public override string? ToString() => Name;
 }

@@ -62,21 +62,21 @@
     <Folder Include="dbo\Tables\" />
     <Folder Include="dbo\Programmability" />
     <Folder Include="dbo\Programmability\Stored Procedures" />
+    <Folder Include="dbo\Programmability\Types" />
+    <Folder Include="dbo\Programmability\Functions" />
   </ItemGroup>
   <ItemGroup>
-    <Build Include="dbo\Tables\__EFMigrationsHistory.sql" />
-    <Build Include="dbo\Tables\AspNetRoles.sql" />
-    <Build Include="dbo\Tables\AspNetUsers.sql" />
-    <Build Include="dbo\Tables\AspNetRoleClaims.sql" />
-    <Build Include="dbo\Tables\AspNetUserClaims.sql" />
-    <Build Include="dbo\Tables\AspNetUserLogins.sql" />
-    <Build Include="dbo\Tables\AspNetUserRoles.sql" />
-    <Build Include="dbo\Tables\AspNetUserTokens.sql" />
     <Build Include="dbo\Tables\tbAppointments.sql" />
     <Build Include="dbo\Programmability\Stored Procedures\spAppointmentsAdd.sql" />
+    <Build Include="dbo\Tables\tbUsers.sql" />
+    <Build Include="dbo\Programmability\Stored Procedures\spUsersAdd.sql" />
+    <Build Include="dbo\Programmability\Stored Procedures\spUsersList.sql" />
+    <Build Include="dbo\Programmability\Stored Procedures\spAppointmentsList.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Database.publish.xml" />
-    <None Include="Database_1.publish.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <RefactorLog Include="Database.refactorlog" />
   </ItemGroup>
 </Project>

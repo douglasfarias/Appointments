@@ -1,32 +1,48 @@
-﻿using ClassLibrary.Models;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
 
-using System.Security.Claims;
+using ClassLibrary.Data.Commands;
+using ClassLibrary.Models;
 
 namespace ClassLibrary.Factories;
 
-public class UserFactory
+public interface IUserFactory
 {
-    private static ClaimsPrincipal CreatePrincipal(string name, string givenName, string surname, string role)
-    {
-        var claims = new List<Claim>
-        {
-            new Claim(ClaimTypes.Name, name),
-            new Claim(ClaimTypes.GivenName, givenName),
-            new Claim(ClaimTypes.Surname, surname),
-            new Claim(ClaimTypes.Role, role),
-            new Claim(ClaimTypes.AuthenticationMethod, "password"),
-        };
-        var identity = new ClaimsIdentity(claims);
-        return new ClaimsPrincipal(identity);
-    }
+	Customer CreateCustomer(CreateCustomerCommand command);
+	Customer CreateCustomer(string email, string givenName, string surname, string phone);
+	Employee CreateEmployee(string email, string givenName, string surname, string phone);
+	Employee CreateEmployee(CreateEmployeeCommand command);
+}
 
-    public static Customer CreateCustomer(string name, string givenName, string surname)
-    {
-        return new Customer(CreatePrincipal(name, givenName, surname, "customer"));
-    }
+public class UserFactory : IUserFactory
+{
+	public Customer CreateCustomer(string email, string givenName, string surname, string phone)
+	{
+		return new Customer(role: UserRole.Customer,
+					  givenName: givenName,
+					  surename: surname,
+					  email: email,
+					  phone: phone);
+	}
 
-    public static Employee CreateEmployee(string name, string givenName, string surname)
-    {
-        return new Employee(CreatePrincipal(name, givenName, surname, "employee"));
-    }
+	public Customer CreateCustomer(CreateCustomerCommand command)
+	{
+		return CreateCustomer(command.Email, command.GivenName, command.SureName, command.Phone);
+	}
+
+	public Employee CreateEmployee(string email, string givenName, string surname, string phone)
+	{
+		return new Employee(role: UserRole.Employee,
+					  givenName: givenName,
+					  surename: surname,
+					  email: email,
+					  phone: phone);
+	}
+
+	public Employee CreateEmployee(CreateEmployeeCommand command)
+	{
+		return CreateEmployee(command.Email, command.GivenName, command.SureName, command.Phone);
+	}
+
 }

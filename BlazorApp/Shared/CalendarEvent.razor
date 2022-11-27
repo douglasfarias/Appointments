@@ -2,52 +2,8 @@
 @using ClassLibrary.Models
 @using System.Security.Claims
 
-<div class="card bg-secondary">
-    <div class="card-body">
-        <dl class="row">
-            <dt class="col-sm-6">
-                <small>
-                    Hora:
-                </small>
-            </dt>
-            <dd class="col-sm-6">
-                <small>
-                    @Appointment?.Date.ToShortTimeString()
-                </small>
-            </dd>
-            <dt class="col-sm-6">
-                <small>
-                    Profissional:
-                </small>
-            </dt>
-            <dd class="col-sm-6">
-                <small>
-                    @Appointment?.Employee?.GetFullName()
-                </small>
-            </dd>
-            <dt class="col-sm-6">
-                <small>
-                    Cliente:
-                </small>
-            </dt>
-            <dd class="col-sm-6">
-                <small>
-                    @Appointment?.Customer?.GetFullName()
-                </small>
-            </dd>
-            <dt class="col-sm-6">
-                <small>
-                    Concluído:
-                </small>
-            </dt>
-            <dd class="col-sm-6">
-                <small>
-                    @(Appointment?.Done == true ? "Sim" : "Não")
-                </small>
-            </dd>
-        </dl>
-    </div>
-</div>
+<span class="badge bg-secondary">@Appointment?.Customer?.GetFullName()</span>
+
 @code {
     [Parameter]
     public Appointment? Appointment { get; set; }

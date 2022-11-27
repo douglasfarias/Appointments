@@ -5,8 +5,8 @@
     <TargetDatabaseName>Appointments</TargetDatabaseName>
     <DeployScriptFileName>Database.sql</DeployScriptFileName>
     <TargetConnectionString>Data Source=(localdb)\MSSQLLocalDB;Integrated Security=True;Persist Security Info=False;Pooling=False;MultipleActiveResultSets=False;Connect Timeout=60;Encrypt=False;TrustServerCertificate=False</TargetConnectionString>
-    <BlockWhenDriftDetected>True</BlockWhenDriftDetected>
-    <RegisterDataTierApplication>True</RegisterDataTierApplication>
+    <BlockWhenDriftDetected>False</BlockWhenDriftDetected>
+    <RegisterDataTierApplication>False</RegisterDataTierApplication>
     <ProfileVersionNumber>1</ProfileVersionNumber>
   </PropertyGroup>
 </Project>

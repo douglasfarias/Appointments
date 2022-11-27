@@ -1,0 +1,39 @@
+﻿<input type="text" class="form-control form-control-sm" list="@Id" @oninput="HandleOnInput" value="@Label" />
+<datalist id="@Id" name="items">
+    @if(Options is not null)
+    {
+        foreach (var item in Options)
+        {
+            <option value="@item.Value">@item.Label</option>
+        }
+    }
+</datalist>
+
+@code {
+    [Parameter]
+    public EventCallback<string> SelectionChanged { get; set; }
+    [Parameter]
+    public string Label { get; set; }
+    [Parameter]
+    public string Id { get; set; }
+    [Parameter]
+    public IEnumerable<Option> Options { get; set; }
+
+    private void HandleOnInput(ChangeEventArgs args)
+    {
+        var term = args.Value?.ToString();
+        SelectionChanged.InvokeAsync(term);
+    }
+
+    public struct Option
+    {
+        public Option(string value, string label)
+        {
+            Value = value;
+            Label = label;
+        }
+
+        public string? Value { get; set; }    
+        public string? Label { get; set; }
+    }
+}

@@ -6,13 +6,13 @@
 	[Deleted] bit not null default 0,
 	[Date] datetime not null,
 	[Done] bit not null default 0,
-	[CustomerId] nvarchar(450) not null,
-	[EmployeeId] nvarchar(450) not null,
+	[CustomerId] int not null,
+	[EmployeeId] int not null,
 	[AmountDue] numeric(10,2) not null,
 	[AmountPaid] numeric(10,2) not null default 0,
 	constraint pk_tbAppointments_Id primary key (Id),
-	constraint fk_tbAppointments_CustomerId_AspNetUsers_Id foreign key (CustomerId) references AspNetUsers(Id),
-	constraint fk_tbAppointments_EmployeeId_AspNetUsers_Id foreign key (EmployeeId) references AspNetUsers(Id)
+	constraint fk_tbAppointments_CustomerId_tbUsers_Id foreign key (CustomerId) references tbUsers(Id),
+	constraint fk_tbAppointments_EmployeeId_tbUsers_Id foreign key (EmployeeId) references tbUsers(Id)
 
 )
 

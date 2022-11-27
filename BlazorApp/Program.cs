@@ -1,53 +1,52 @@
-using BlazorApp.Areas.Identity;
-using BlazorApp.Data;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
 
-using ClassLibrary.Data;
+using ClassLibrary.Data.Base;
 using ClassLibrary.Data.Handlers;
 using ClassLibrary.Data.Repositories;
 using ClassLibrary.Factories;
-
-using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(connectionString));
-builder.Services.AddDatabaseDeveloperPageExceptionFilter();
-builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
-    .AddEntityFrameworkStores<ApplicationDbContext>();
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
-builder.Services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<IdentityUser>>();
-builder.Services.AddSingleton<WeatherForecastService>();
 
-builder.Services.AddSingleton<IConnectionProvider, SqlServerConnectionProvider>(builder =>
+builder.Services.AddTransient<IConnectionProvider, ConnectionProvider>(provider =>
 {
-    var factory = SqlClientFactory.Instance;
-    var connection = factory.CreateConnection();
-    connection.ConnectionString = connectionString;
-    return SqlServerConnectionProvider.CreateInstance(connection);
+	var connection = SqlClientFactory.Instance.CreateConnection();
+	connection.ConnectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+	return ConnectionProviderFactory.CreateSqlServerConnectionProvider(connection);
 });
+
+builder.Services.AddSingleton<ICommandFactory, CommandFactory>();
+builder.Services.AddSingleton<IUserFactory, UserFactory>();
 builder.Services.AddSingleton<IAppointmentsFactory, AppointmentsFactory>();
+
+builder.Services.AddSingleton<ICustomersRepository, CustomersRepository>();
+builder.Services.AddSingleton<IEmployeesRepository, EmployeesRepository>();
 builder.Services.AddSingleton<IAppointmentsRepository, AppointmentsRepository>();
+
+builder.Services.AddSingleton<ICustomersHandler, CustomersHandler>();
+builder.Services.AddSingleton<IEmployeesHandler, EmployeesHandler>();
 builder.Services.AddSingleton<IAppointmentsHandler, AppointmentsHandler>();
+
 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseMigrationsEndPoint();
+	app.UseMigrationsEndPoint();
 }
 else
 {
-    app.UseExceptionHandler("/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-    app.UseHsts();
+	app.UseExceptionHandler("/Error");
+	// The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+	app.UseHsts();
 }
 
 app.UseHttpsRedirection();

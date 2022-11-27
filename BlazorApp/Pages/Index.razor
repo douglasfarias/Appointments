@@ -1,32 +1,77 @@
 ﻿@page "/"
+@using ClassLibrary.Data.Handlers;
+@using ClassLibrary.Data.Queries;
+@using ClassLibrary.Data.Repositories;
+@using ClassLibrary.Factories;
+@using ClassLibrary.Models;
 
 <PageTitle>Index</PageTitle>
 
-<h4 class="text-center">Agendamentos</h4>
+<Modal Id="createAppointmentModal" Label="Novo Agendamento">
+    <CreateAppointmentForm />
+</Modal>
 
-<CreateAppointmentForm />
+<Modal Id="createCustomerModal" Label="Novo Cliente">
+    <CreateCustomerForm />
+</Modal>
+
+<Modal Id="createEmployeeModal" Label="Novo Profissional">
+    <CreateEmployeeForm />
+</Modal>
 
 <Calendar ExpandedEventsCallback="@(state => ExpandedEvents = state)">
     <Month>
-        <CalendarMonth Days="_days" Context="day">
+        <CalendarMonth Days="_appointments.Keys" Context="day">
             <DayTemplate>
-                <CalendarDay DayNumberAndName="day" Expanded="ExpandedEvents"></CalendarDay>
+                <CalendarDay Day="day" Expanded="ExpandedEvents" Appointments="_appointments.GetValueOrDefault(day)"></CalendarDay>
             </DayTemplate>
         </CalendarMonth>
     </Month>
 </Calendar>
 
 @code {
+    @implements IDisposable
+
+    [Inject]
+    public IAppointmentsHandler? AppointmentsHandler { get; set; }
+
+    [Inject]
+    public ICommandFactory? CommandFactory { get; set; }
+
     bool ExpandedEvents;
-    List<KeyValuePair<int, string>> _days = new();
-    protected override void OnInitialized()
+    Dictionary<DateTime, List<Appointment>> _appointments = new();
+    ListAppointmentsQuery? _listAppointmentsQuery;
+    protected override async Task OnInitializedAsync()
     {
-        _days.Add(new KeyValuePair<int, string>(1, "Segunda-feira"));
-        _days.Add(new KeyValuePair<int, string>(2, "Terça-feira"));
-        _days.Add(new KeyValuePair<int, string>(3, "Quarta-feira"));
-        _days.Add(new KeyValuePair<int, string>(4, "Quinta-feira"));
-        _days.Add(new KeyValuePair<int, string>(5, "Sexta-feira"));
-        _days.Add(new KeyValuePair<int, string>(6, "Sábado"));
-        _days.Add(new KeyValuePair<int, string>(7, "Domingo"));
+        _listAppointmentsQuery = CommandFactory!.ListAppointmentsQuery(AppointmentsHandler!.HandleAsync);
+
+        AppointmentsHandler!.AppointmentCreated += OnAppointmentCreated;
+
+        await LoadAppointments();
+    }
+
+    public void Dispose()
+    {
+        AppointmentsHandler!.AppointmentCreated -= OnAppointmentCreated;
+    }
+
+    private void OnAppointmentCreated(object? sender, Appointment appointment)
+    {
+        var date = DateTime.Parse(appointment.Date.ToShortDateString());
+        _appointments.GetValueOrDefault(date)?.Add(appointment);
+        StateHasChanged();
+    }
+
+    async Task LoadAppointments(DateTime? date = null)
+    {
+        var today = DateTime.Parse((date ?? DateTime.Now).ToShortDateString());
+        for (int index = 0; index < 7; index++)
+        {
+            _listAppointmentsQuery!.StartDate = today.AddDays(index);
+            _listAppointmentsQuery!.EndDate = today.AddDays(index + 1);
+
+            var appointments = await _listAppointmentsQuery!.ExecuteAsync()!;
+            _appointments.Add(_listAppointmentsQuery.StartDate, appointments);
+        }
     }
 }

@@ -1,0 +1,82 @@
+﻿@using ClassLibrary.Data.Commands;
+@using ClassLibrary.Data.Handlers;
+@using ClassLibrary.Factories;
+@using ClassLibrary.Models;
+
+@if (_model is null)
+    return;
+
+<EditForm Model="_model" OnValidSubmit="HandleValidSubmit">
+    <fieldset>
+        <legend class="text-center">
+            <small>
+                Novo Profissional
+            </small>
+        </legend>
+        <div class="form-group mb-3">
+            <div class="row">
+                <div class="col">
+                    <label class="col-form-label-sm">
+                        Primeiro Nome
+                    </label>
+                    <InputText @bind-Value="_model.GivenName" class="form-control form-control-sm" />
+                </div>
+                <div class="col">
+                    <label class="col-form-label-sm">
+                        Sobrenome
+                    </label>
+                    <InputText @bind-Value="_model.SureName" class="form-control form-control-sm" />
+                </div>
+            </div>
+        </div>
+        <div class="form-group mb-3">
+            <div class="row">
+                <div class="col">
+                    <label class="col-form-label-sm">
+                        Telefone
+                    </label>
+                    <InputText @bind-Value="_model.Phone" class="form-control form-control-sm" />
+                </div>
+                <div class="col">
+                    <label class="col-form-label-sm">
+                        Email
+                    </label>
+                    <InputText @bind-Value="_model.Email" class="form-control form-control-sm" />
+                </div>
+            </div>
+        </div>
+        <div class="form-group mb-3">
+            <div class="row">
+                <div class="col">
+                    <input type="submit" class="btn btn-sm btn-primary" value="Enviar" disabled="@_loading" />
+                </div>
+                <div class="col">
+                    <Spinner Show="_loading" />
+                </div>
+            </div>
+        </div>
+    </fieldset>
+</EditForm>
+
+@code {
+    [Inject]
+    public ICommandFactory? CommandFactory { get; set; }
+    [Inject]
+    public IEmployeesHandler? EmployeesHandler { get; set; }
+
+    CreateEmployeeCommand? _model;
+    bool _loading = true;
+    protected override void OnInitialized()
+    {
+        _model = CommandFactory?.CreateEmployeeCommand(EmployeesHandler!.HandleAsync);
+        _loading = false;
+    }
+
+    private async Task HandleValidSubmit(EditContext context)
+    {
+        _loading = true;
+        await _model!.ExecuteAsync();
+        _model = CommandFactory?.CreateEmployeeCommand(EmployeesHandler!.HandleAsync);
+        _loading = false;
+    }
+}
