@@ -82,7 +82,7 @@
     void OnAppointmentCreated(object? sender, Appointment appointment)
     {
         var date = appointment.Date.Date;
-        if (date == Day)
+        if (date != Day)
             return;
 
         _appointments?.Add(appointment);
