@@ -1,9 +1,11 @@
-﻿@using ClassLibrary.Data.Repositories;
+﻿@using ClassLibrary.Data.Handlers;
+@using ClassLibrary.Data.Queries;
+@using ClassLibrary.Data.Repositories;
 @using ClassLibrary.Factories;
 @using ClassLibrary.Models
 @using System.Globalization;
 
-<div id="day" name="day" class="col-sm-3 col-md-3 col-lg-3 col-xl-3 flex-shrink-0 flex-grow-0 px-0">
+<div id="day" name="day" class="col-sm-3 col-md-3 col-lg-3 col-xl-3 flex-shrink-0 px-0">
     <div class="card rounded-0 bg-dark border-secondary">
         <div class="card-header border-secondary">
             <div class="container-fluid p-0">
@@ -28,16 +30,20 @@
             {
                 var hour = index.ToString().PadLeft(2, '0');
                 <div class="row border-bottom border-secondary py-0 px-0 mx-0 my-0">
-                    <div class="col-sm-3 py-5 border-end border-secondary">
+                    <div class="col-sm-4 col-md-3 py-5 border-end border-secondary">
                         @($"{hour}:00")
                     </div>
                     <div class="col py-3">
-                        @if (Appointments is not null && Appointments.Count > 0)
+                        @if (_appointments is not null && _appointments.Count > 0)
                         {
-                            foreach (var appointment in Appointments.Where(item => item.Date.Hour.ToString().PadLeft(2, '0').Equals(hour)).OrderBy(item => item.Date.Hour))
+                            foreach (var appointment in _appointments.Where(item => item.Date.Hour.ToString().PadLeft(2, '0').Equals(hour)).OrderBy(item => item.Date.Hour))
                             {
-                                <CalendarEvent Appointment="appointment" Expanded="Expanded" />
+                                <CalendarEvent Appointment="appointment" />
                             }
+                        }
+                        else
+                        {
+                            <Spinner />
                         }
                     </div>
                 </div>
@@ -47,10 +53,44 @@
 </div>
 
 @code {
+    @implements IDisposable
+
+    [Inject]
+    public ICommandFactory? CommandFactory { get; set; }
+    [Inject]
+    public IAppointmentsHandler? AppointmentsHandler { get; set; }
+
     [Parameter]
     public DateTime Day { get; set; }
-    [Parameter]
-    public bool Expanded { get; set; }
-    [Parameter]
-    public List<Appointment>? Appointments { get; set; }
+
+    List<Appointment>? _appointments;
+    ListAppointmentsQuery? _listAppointmentsQuery;
+
+    protected override void OnInitialized()
+    {
+        _listAppointmentsQuery = CommandFactory!.ListAppointmentsQuery(AppointmentsHandler!.HandleAsync);
+        AppointmentsHandler!.AppointmentCreated += OnAppointmentCreated;
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        _listAppointmentsQuery!.StartDate = Day;
+        _listAppointmentsQuery!.EndDate = Day.AddDays(1);
+        _appointments = await _listAppointmentsQuery!.ExecuteAsync()!;
+    }
+
+    void OnAppointmentCreated(object? sender, Appointment appointment)
+    {
+        var date = appointment.Date.Date;
+        if (date == Day)
+            return;
+
+        _appointments?.Add(appointment);
+    }
+
+    public void Dispose()
+    {
+        AppointmentsHandler!.AppointmentCreated -= OnAppointmentCreated;
+    }
+
 }

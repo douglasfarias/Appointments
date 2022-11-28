@@ -7,12 +7,14 @@
     return;
 
 <EditForm Model="_model" OnValidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator />
     <fieldset>
         <legend class="text-center">
             <small>
                 Novo Cliente
             </small>
         </legend>
+        <ValidationSummary />
         <div class="form-group mb-3">
             <div class="row">
                 <div class="col">

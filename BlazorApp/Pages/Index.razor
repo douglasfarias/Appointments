@@ -19,59 +19,44 @@
     <CreateEmployeeForm />
 </Modal>
 
-<Calendar ExpandedEventsCallback="@(state => ExpandedEvents = state)">
+<Calendar>
+    <Header>
+        <CalendarHeader NextPage="NextPage" PreviousPage="PreviousPage" />
+    </Header>
     <Month>
-        <CalendarMonth Days="_appointments.Keys" Context="day">
+        <CalendarMonth Days="_days" Context="day">
             <DayTemplate>
-                <CalendarDay Day="day" Expanded="ExpandedEvents" Appointments="_appointments.GetValueOrDefault(day)"></CalendarDay>
+                <CalendarDay Day="day" />
             </DayTemplate>
         </CalendarMonth>
     </Month>
 </Calendar>
 
 @code {
-    @implements IDisposable
+    DateTime _currentDate;
+    List<DateTime>? _days;
 
-    [Inject]
-    public IAppointmentsHandler? AppointmentsHandler { get; set; }
-
-    [Inject]
-    public ICommandFactory? CommandFactory { get; set; }
-
-    bool ExpandedEvents;
-    Dictionary<DateTime, List<Appointment>> _appointments = new();
-    ListAppointmentsQuery? _listAppointmentsQuery;
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
-        _listAppointmentsQuery = CommandFactory!.ListAppointmentsQuery(AppointmentsHandler!.HandleAsync);
-
-        AppointmentsHandler!.AppointmentCreated += OnAppointmentCreated;
-
-        await LoadAppointments();
+        _days = new();
+        _currentDate = DateTime.Now;
+        for (int index = 0; index < 6; index++)
+            _days.Add(_currentDate.AddDays(index).Date);
     }
 
-    public void Dispose()
+    void NextPage()
     {
-        AppointmentsHandler!.AppointmentCreated -= OnAppointmentCreated;
+        _days = new();
+        _currentDate = _currentDate.AddDays(1);
+        for (int index = 0; index < 6; index++)
+            _days.Add(_currentDate.AddDays(index).Date);
     }
 
-    private void OnAppointmentCreated(object? sender, Appointment appointment)
+    void PreviousPage()
     {
-        var date = DateTime.Parse(appointment.Date.ToShortDateString());
-        _appointments.GetValueOrDefault(date)?.Add(appointment);
-        StateHasChanged();
-    }
-
-    async Task LoadAppointments(DateTime? date = null)
-    {
-        var today = DateTime.Parse((date ?? DateTime.Now).ToShortDateString());
-        for (int index = 0; index < 7; index++)
-        {
-            _listAppointmentsQuery!.StartDate = today.AddDays(index);
-            _listAppointmentsQuery!.EndDate = today.AddDays(index + 1);
-
-            var appointments = await _listAppointmentsQuery!.ExecuteAsync()!;
-            _appointments.Add(_listAppointmentsQuery.StartDate, appointments);
-        }
+        _days = new();
+        _currentDate = _currentDate.AddDays(-1);
+        for (int index = 0; index < 6; index++)
+            _days.Add(_currentDate.AddDays(index).Date);
     }
 }

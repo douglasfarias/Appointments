@@ -2,10 +2,12 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+using System.Globalization;
 using ClassLibrary.Data.Base;
 using ClassLibrary.Data.Handlers;
 using ClassLibrary.Data.Repositories;
 using ClassLibrary.Factories;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 
@@ -22,16 +24,16 @@ builder.Services.AddTransient<IConnectionProvider, ConnectionProvider>(provider 
 	return ConnectionProviderFactory.CreateSqlServerConnectionProvider(connection);
 });
 
-builder.Services.AddSingleton<ICommandFactory, CommandFactory>();
-builder.Services.AddSingleton<IUserFactory, UserFactory>();
-builder.Services.AddSingleton<IAppointmentsFactory, AppointmentsFactory>();
+builder.Services.AddTransient<ICommandFactory, CommandFactory>();
+builder.Services.AddTransient<IUserFactory, UserFactory>();
+builder.Services.AddTransient<IAppointmentsFactory, AppointmentsFactory>();
 
-builder.Services.AddSingleton<ICustomersRepository, CustomersRepository>();
-builder.Services.AddSingleton<IEmployeesRepository, EmployeesRepository>();
-builder.Services.AddSingleton<IAppointmentsRepository, AppointmentsRepository>();
+builder.Services.AddTransient<ICustomersRepository, CustomersRepository>();
+builder.Services.AddTransient<IEmployeesRepository, EmployeesRepository>();
+builder.Services.AddTransient<IAppointmentsRepository, AppointmentsRepository>();
 
-builder.Services.AddSingleton<ICustomersHandler, CustomersHandler>();
-builder.Services.AddSingleton<IEmployeesHandler, EmployeesHandler>();
+builder.Services.AddTransient<ICustomersHandler, CustomersHandler>();
+builder.Services.AddTransient<IEmployeesHandler, EmployeesHandler>();
 builder.Services.AddSingleton<IAppointmentsHandler, AppointmentsHandler>();
 
 
@@ -61,5 +63,12 @@ app.UseAuthorization();
 app.MapControllers();
 app.MapBlazorHub();
 app.MapFallbackToPage("/_Host");
+
+app.UseRequestLocalization(new RequestLocalizationOptions
+{
+	DefaultRequestCulture = new RequestCulture("pt-BR"),
+	SupportedUICultures = new List<CultureInfo>() { CultureInfo.CreateSpecificCulture("pt-BR") }
+});
+CultureInfo.DefaultThreadCurrentCulture = CultureInfo.CreateSpecificCulture("pt-BR");
 
 app.Run();

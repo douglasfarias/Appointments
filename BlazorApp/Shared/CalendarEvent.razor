@@ -2,11 +2,11 @@
 @using ClassLibrary.Models
 @using System.Security.Claims
 
-<span class="badge bg-secondary">@Appointment?.Customer?.GetFullName()</span>
+<button class="btn">
+    <span class="badge bg-secondary">@Appointment?.Customer?.GetFullName()</span>
+</button>
 
 @code {
     [Parameter]
     public Appointment? Appointment { get; set; }
-    [Parameter]
-    public bool Expanded { get; set; }
 }

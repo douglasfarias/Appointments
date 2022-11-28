@@ -1,0 +1,15 @@
+﻿<div class="row m-3">
+    <div class="col d-flex justify-content-start">
+        <button type="button" class="btn btn-sm btn-secondary" @onclick="PreviousPage"><i class="bi bi-chevron-left"></i> Voltar</button>
+    </div>
+    <div class="col d-flex justify-content-end">
+        <button type="button" class="btn btn-sm btn-secondary" @onclick="NextPage">Avançar <i class="bi bi-chevron-right"></i></button>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public EventCallback NextPage { get; set; }
+    [Parameter]
+    public EventCallback PreviousPage { get; set; }
+}
